@@ -88,10 +88,12 @@ class CTree {
     }
     catchLayers(layers){
         for(var property in layers){
-            this[property] = []
-            layers[property].forEach((pack)=>{
-                this[property].push(new CBranch(pack))
-            })
+            if(property != 'id'){
+                this[property] = []
+                layers[property].forEach((pack)=>{
+                    this[property].push(new CBranch(pack))
+                })
+            }
         }
         this.toplayer++
         this.leaves = layers.leaves
@@ -118,7 +120,7 @@ class STree {
         var trunk = new SBranch(Vector.create(x, y), Vector.create(x, y - baselen), baselen)
         this.x = x
         this.y = y
-        this.id = Math.random()
+        this.idnum = Math.random()
         this.nlayer = 1
         this.layer1 = [trunk]
         this.layer2 = [trunk.branchLeft(), trunk.branchRight()]
@@ -162,7 +164,8 @@ class STree {
     }
     getUpdatePack(){
         var pack = {
-            leaves:[]
+            leaves:[],
+            id:this.id
         }
         this.leaves.forEach((leaf) => {
             pack.leaves.push({x:leaf.position.x, y:leaf.position.y})
@@ -225,11 +228,13 @@ var setup = function(){
 var draw = function(){
     Engine.update(engine)
     ctx.clearRect(0, 0, canvas.width, canvas.height)
-    //var uppedTrees = STrees.update()
-    if(tree.needsUpdate) ctree.catchLayers(tree.getUpdatePack())
+    var uppedTrees = STrees.update()
+    if(uppedTrees.length != 0) processUpdatePack(uppedTrees)
     //if(uppedTrees.length > 0) processUpdatePack(uppedTrees)
     //ctree.catchLayers(tree.getUpdatePack())
-    ctree.show()
+    CTrees.forEach(tree=>{
+        tree.show()
+    })
 }
 window.onload = function(){
     setup()
